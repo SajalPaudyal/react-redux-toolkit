@@ -1,8 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import Products from "../types/productTypes";
 
+interface cartItem extends Products {
+  quantity: number;
+}
 interface CartState {
-  items: Products[];
+  items: cartItem[];
   products: Products[];
   status: "idle" | "loading" | "loaded" | "failed";
 }
@@ -30,10 +33,20 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addToCart: (state, action: PayloadAction<Products>) => {
-      state.items.push(action.payload);
+      const existingItem = state.items.find(
+        (item) => item.id === action.payload.id
+      );
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else state.items.push({ ...action.payload, quantity: 1 });
     },
-    removeFromCart: (state, action: PayloadAction<Products>) => {
-      state.items.push(action.payload);
+    removeFromCart: (state, action: PayloadAction<number>) => {
+      const index = state.items.findIndex((item) => item.id === action.payload);
+      if (state.items[index].quantity > 1) {
+        state.items[index].quantity -= 1;
+      } else {
+        state.items.splice(index, 1);
+      }
     },
   },
   extraReducers: (builder) => {
@@ -50,5 +63,5 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addToCart } = cartSlice.actions;
+export const { addToCart, removeFromCart } = cartSlice.actions;
 export default cartSlice.reducer;

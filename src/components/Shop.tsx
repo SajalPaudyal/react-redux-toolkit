@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 import Products from "../types/productTypes.ts";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, fetchProducts } from "../stores/cartSlice.ts";
+import {
+  addToCart,
+  fetchProducts,
+  removeFromCart,
+} from "../stores/cartSlice.ts";
 import { AppDispatch, RootState } from "../stores/store.ts";
 
 export const Shop: React.FC = () => {
@@ -20,12 +24,13 @@ export const Shop: React.FC = () => {
     dispatch(addToCart(product));
   };
 
-  if(status == 'loading'){
-    return <div>
-      Loading Items...
-    </div>
-  }
+  const handleRemoveFromCart = (index: number) => {
+    dispatch(removeFromCart(index));
+  };
 
+  if (status == "loading") {
+    return <div>Loading Items...</div>;
+  }
 
   return (
     <div className="flex flex-wrap gap-8">
@@ -50,6 +55,12 @@ export const Shop: React.FC = () => {
             >
               Add to Cart
             </button>
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-300"
+              onClick={() => handleRemoveFromCart(product.id)}
+            >
+              Remove from cart
+            </button>
           </div>
         </div>
       ))}
@@ -60,6 +71,7 @@ export const Shop: React.FC = () => {
           <div key={index}>
             <h4>{item.title}</h4>
             <p>${item.price}</p>
+            <p>{item.quantity}</p>
           </div>
         ))}
       </div>
